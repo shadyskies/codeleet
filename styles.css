@@ -397,6 +397,12 @@ tr:last-child td {
 .solved-column {
     width: 80px;
     text-align: center;
+    cursor: default !important;
+    user-select: none;
+}
+
+.solved-column:hover {
+    background: var(--surface) !important;
 }
 
 .solved-checkbox {
@@ -708,6 +714,20 @@ footer {
     
     th, td {
         padding: 8px 12px;
+    }
+    
+    .solved-column {
+        width: 60px;
+        padding: 8px 6px;
+    }
+    
+    .solved-checkbox input[type="checkbox"] {
+        width: 16px;
+        height: 16px;
+    }
+    
+    .solved-checkbox input[type="checkbox"]:checked::after {
+        font-size: 10px;
     }
     
     .company-card {
