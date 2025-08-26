@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LeetCode Company-wise Interview Questions</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🚀 LeetCode Company-wise Interview Questions</h1>
+            <p>Select a company to view their frequently asked interview questions</p>
+        </header>
+        
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Search companies..." />
+            <span class="search-icon">🔍</span>
+        </div>
+        
+        <div class="stats">
+            <div class="stat-card">
+                <h3 id="totalCompanies">0</h3>
+                <p>Companies</p>
+            </div>
+            <div class="stat-card">
+                <h3 id="filteredCompanies">0</h3>
+                <p>Filtered</p>
+            </div>
+        </div>
+        
+        <div class="companies-grid" id="companiesGrid">
+            <!-- Companies will be loaded here -->
+        </div>
+        
+        <footer>
+            <p>Data sourced from LeetCode | Built for interview preparation</p>
+        </footer>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>
