@@ -67,8 +67,6 @@ class CompanyQuestions {
     updateCompanyHeader() {
         const displayName = this.formatCompanyName(this.companyName);
         document.getElementById('companyName').textContent = displayName;
-        document.getElementById('companyDescription').textContent = 
-            `Interview questions frequently asked at ${displayName}`;
         document.title = `${displayName} - Interview Questions`;
     }
 
@@ -507,37 +505,6 @@ function addExportFunctionality() {
     `;
     document.head.appendChild(style);
 
-    const exportBtn = document.createElement('button');
-    exportBtn.className = 'export-btn';
-    exportBtn.innerHTML = '📊 Export CSV';
-    exportBtn.addEventListener('click', exportToCSV);
-    document.body.appendChild(exportBtn);
-}
-
-function exportToCSV() {
-    const companyQuestions = window.companyQuestionsInstance;
-    if (!companyQuestions) return;
-
-    const csv = [
-        ['Solved', 'ID', 'Title', 'Difficulty', 'Acceptance %', 'Frequency %', 'URL'],
-        ...companyQuestions.filteredQuestions.map(q => [
-            companyQuestions.solvedQuestions.has(q.id) ? 'Yes' : 'No',
-            q.id,
-            q.title,
-            q.difficulty,
-            q.acceptanceRaw,
-            q.frequencyRaw,
-            q.url
-        ])
-    ].map(row => row.map(cell => `"${cell}"`).join(',')).join('\n');
-
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${companyQuestions.companyName}-questions.csv`;
-    a.click();
-    window.URL.revokeObjectURL(url);
 }
 
 // Initialize the application

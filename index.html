@@ -9,7 +9,7 @@
 <body>
     <div class="container">
         <header>
-            <h1>🚀 LeetCode Company-wise Interview Questions</h1>
+            <h1>LeetCode Company Interview Questions</h1>
             <p>Select a company to view their frequently asked interview questions</p>
         </header>
         
@@ -27,6 +27,33 @@
                 <h3 id="filteredCompanies">0</h3>
                 <p>Filtered</p>
             </div>
+            <div class="stat-card">
+                <h3 id="totalQuestions">0</h3>
+                <p>Questions</p>
+            </div>
+            <div class="stat-card">
+                <h3 id="avgQuestions">0</h3>
+                <p>Avg per Company</p>
+            </div>
+            <div class="stat-card difficulty-easy">
+                <h3 id="easyQuestions">0</h3>
+                <p>Easy</p>
+            </div>
+            <div class="stat-card difficulty-medium">
+                <h3 id="mediumQuestions">0</h3>
+                <p>Medium</p>
+            </div>
+            <div class="stat-card difficulty-hard">
+                <h3 id="hardQuestions">0</h3>
+                <p>Hard</p>
+            </div>
+        </div>
+        
+        <div id="loadingStats" class="loading-stats" style="display: none;">
+            <div class="loading-bar">
+                <div class="loading-progress" id="loadingProgress"></div>
+            </div>
+            <p id="loadingText">Loading company statistics... <span id="loadingCount">0</span>/<span id="totalCount">0</span></p>
         </div>
         
         <div class="companies-grid" id="companiesGrid">

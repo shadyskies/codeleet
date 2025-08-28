@@ -114,8 +114,8 @@ header p {
 /* Search Container */
 .search-container {
     position: relative;
-    max-width: 400px;
-    margin: 0 auto 24px;
+    width: 50%;
+    margin: 0 auto auto;
 }
 
 .search-container input {
@@ -187,6 +187,67 @@ header p {
     letter-spacing: 0.05em;
 }
 
+/* Difficulty-specific stat cards */
+.stat-card.difficulty-easy {
+    border-color: var(--success);
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(16, 185, 129, 0.05));
+}
+
+.stat-card.difficulty-easy h3 {
+    color: var(--success);
+}
+
+.stat-card.difficulty-medium {
+    border-color: var(--warning);
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(245, 158, 11, 0.05));
+}
+
+.stat-card.difficulty-medium h3 {
+    color: var(--warning);
+}
+
+.stat-card.difficulty-hard {
+    border-color: var(--error);
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(239, 68, 68, 0.05));
+}
+
+.stat-card.difficulty-hard h3 {
+    color: var(--error);
+}
+
+/* Loading stats */
+.loading-stats {
+    text-align: center;
+    padding: 20px;
+    margin-bottom: 24px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--border-radius-lg);
+}
+
+.loading-bar {
+    width: 100%;
+    height: 8px;
+    background: var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 12px;
+}
+
+.loading-progress {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--success));
+    width: 0%;
+    transition: width 0.3s ease;
+    border-radius: 4px;
+}
+
+.loading-stats p {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
 @media (min-width: 768px) {
     .stats {
         grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
@@ -245,6 +306,41 @@ header p {
     color: var(--text-secondary);
     font-size: 12px;
     font-weight: 500;
+    margin-bottom: 8px;
+}
+
+.company-difficulty-breakdown {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-top: 8px;
+}
+
+.difficulty-tag {
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.difficulty-tag.easy {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--success);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.difficulty-tag.medium {
+    background: rgba(245, 158, 11, 0.1);
+    color: var(--warning);
+    border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.difficulty-tag.hard {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--error);
+    border: 1px solid rgba(239, 68, 68, 0.2);
 }
 
 @media (min-width: 768px) {
@@ -406,7 +502,6 @@ tr:last-child td {
 }
 
 .solved-checkbox {
-    display: flex;
     align-items: center;
     justify-content: center;
 }
@@ -743,6 +838,16 @@ footer {
         flex-direction: column;
         align-items: flex-start;
         gap: 4px;
+    }
+    
+    .difficulty-tag {
+        font-size: 9px;
+        padding: 1px 4px;
+    }
+    
+    .company-difficulty-breakdown {
+        gap: 4px;
+        margin-top: 6px;
     }
     
     .leetcode-link {

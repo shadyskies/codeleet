@@ -2,6 +2,14 @@ class CompanyDirectory {
     constructor() {
         this.companies = [];
         this.filteredCompanies = [];
+        this.uniqueQuestions = new Map(); // Map of questionId -> {title, difficulty, url}
+        this.totalStats = {
+            totalQuestions: 0,
+            easyQuestions: 0,
+            mediumQuestions: 0,
+            hardQuestions: 0,
+            avgQuestions: 0
+        };
         this.init();
     }
 
@@ -24,13 +32,17 @@ class CompanyDirectory {
                 name: name.trim(),
                 displayName: this.formatCompanyName(name.trim()),
                 csvFile: `data/${name.trim()}.csv`,
-                questionsCount: 0 // Will be loaded later if needed
+                questionsCount: 0,
+                easyCount: 0,
+                mediumCount: 0,
+                hardCount: 0,
+                loaded: false
             }));
 
             this.filteredCompanies = [...this.companies];
             
-            // Optionally load question counts for each company
-            await this.loadQuestionCounts();
+            // Load question counts and difficulty breakdown for ALL companies
+            await this.loadAllCompanyStats();
             
         } catch (error) {
             console.error('Error loading companies:', error);
@@ -38,21 +50,141 @@ class CompanyDirectory {
         }
     }
 
-    async loadQuestionCounts() {
-        // Load question counts for a few companies to show stats
-        const sampleCompanies = this.companies.slice(0, 10);
+    async loadAllCompanyStats() {
+        const loadingStats = document.getElementById('loadingStats');
+        const loadingProgress = document.getElementById('loadingProgress');
+        const loadingCount = document.getElementById('loadingCount');
+        const totalCount = document.getElementById('totalCount');
         
-        for (const company of sampleCompanies) {
-            try {
-                const response = await fetch(company.csvFile);
-                if (response.ok) {
-                    const text = await response.text();
-                    const lines = text.trim().split('\n');
-                    company.questionsCount = Math.max(0, lines.length - 1); // Subtract header
+        // Show loading indicator
+        loadingStats.style.display = 'block';
+        totalCount.textContent = this.companies.length;
+        
+        let loadedCount = 0;
+        const batchSize = 5; // Process in batches to avoid overwhelming the browser
+        
+        for (let i = 0; i < this.companies.length; i += batchSize) {
+            const batch = this.companies.slice(i, i + batchSize);
+            
+            await Promise.all(batch.map(async (company) => {
+                try {
+                    const response = await fetch(company.csvFile);
+                    if (response.ok) {
+                        const text = await response.text();
+                        const lines = text.trim().split('\n');
+                        
+                        if (lines.length > 1) { // Has header + data
+                            company.questionsCount = lines.length - 1;
+                            
+                            // Parse each question and add to unique questions map
+                            for (let j = 1; j < lines.length; j++) {
+                                const line = lines[j];
+                                const columns = this.parseCSVLine(line);
+                                if (columns.length >= 4) {
+                                    const questionId = parseInt(columns[0]);
+                                    const title = columns[2]?.trim() || '';
+                                    const difficulty = columns[3]?.trim() || '';
+                                    const url = columns[1]?.trim() || '';
+                                    
+                                    // Add to unique questions map (overwrites if same ID exists)
+                                    if (questionId && !isNaN(questionId)) {
+                                        this.uniqueQuestions.set(questionId, {
+                                            title,
+                                            difficulty,
+                                            url
+                                        });
+                                    }
+                                    
+                                    // Count for this company's breakdown
+                                    const difficultyLower = difficulty.toLowerCase();
+                                    if (difficultyLower === 'easy') company.easyCount++;
+                                    else if (difficultyLower === 'medium') company.mediumCount++;
+                                    else if (difficultyLower === 'hard') company.hardCount++;
+                                }
+                            }
+                        }
+                        company.loaded = true;
+                    }
+                } catch (error) {
+                    console.log(`Could not load stats for ${company.name}:`, error);
                 }
-            } catch (error) {
-                console.log(`Could not load questions count for ${company.name}`);
+                
+                loadedCount++;
+                loadingCount.textContent = loadedCount;
+                const progress = (loadedCount / this.companies.length) * 100;
+                loadingProgress.style.width = `${progress}%`;
+            }));
+            
+            // Small delay to allow UI updates
+            await new Promise(resolve => setTimeout(resolve, 10));
+        }
+        
+        // Calculate total stats
+        this.calculateTotalStats();
+        
+        // Debug log to verify unique counting
+        console.log(`Loaded ${this.uniqueQuestions.size} unique questions from ${this.companies.filter(c => c.loaded).length} companies`);
+        console.log('Difficulty breakdown:', {
+            easy: this.totalStats.easyQuestions,
+            medium: this.totalStats.mediumQuestions,
+            hard: this.totalStats.hardQuestions
+        });
+        
+        // Hide loading indicator
+        loadingStats.style.display = 'none';
+        
+        // Update the display
+        this.renderCompanies();
+        this.updateStats();
+    }
+
+    parseCSVLine(line) {
+        const result = [];
+        let current = '';
+        let inQuotes = false;
+        
+        for (let i = 0; i < line.length; i++) {
+            const char = line[i];
+            if (char === '"') {
+                inQuotes = !inQuotes;
+            } else if (char === ',' && !inQuotes) {
+                result.push(current.trim());
+                current = '';
+            } else {
+                current += char;
             }
+        }
+        result.push(current.trim());
+        return result;
+    }
+
+    calculateTotalStats() {
+        // Calculate unique question stats from the map
+        this.totalStats = {
+            totalQuestions: this.uniqueQuestions.size,
+            easyQuestions: 0,
+            mediumQuestions: 0,
+            hardQuestions: 0,
+            avgQuestions: 0
+        };
+        
+        // Count unique questions by difficulty
+        for (const question of this.uniqueQuestions.values()) {
+            const difficulty = question.difficulty.toLowerCase();
+            if (difficulty === 'easy') {
+                this.totalStats.easyQuestions++;
+            } else if (difficulty === 'medium') {
+                this.totalStats.mediumQuestions++;
+            } else if (difficulty === 'hard') {
+                this.totalStats.hardQuestions++;
+            }
+        }
+        
+        // Calculate average questions per company (based on total unique questions)
+        const loadedCompanies = this.companies.filter(c => c.loaded);
+        if (loadedCompanies.length > 0) {
+            const totalCompanyQuestions = loadedCompanies.reduce((sum, company) => sum + company.questionsCount, 0);
+            this.totalStats.avgQuestions = Math.round(totalCompanyQuestions / loadedCompanies.length);
         }
     }
 
@@ -114,9 +246,14 @@ class CompanyDirectory {
             <a href="company.html?company=${encodeURIComponent(company.name)}" class="company-card">
                 <div class="company-name">${company.displayName}</div>
                 <div class="company-stats">
-                    <span>📄 ${company.questionsCount || 'N/A'} questions</span>
-                    <span>🏢 ${company.name}</span>
                 </div>
+                ${company.loaded ? `
+                    <div class="company-difficulty-breakdown">
+                        <span class="difficulty-tag easy">${company.easyCount} Easy</span>
+                        <span class="difficulty-tag medium">${company.mediumCount} Medium</span>
+                        <span class="difficulty-tag hard">${company.hardCount} Hard</span>
+                    </div>
+                ` : ''}
             </a>
         `).join('');
 
@@ -141,6 +278,13 @@ class CompanyDirectory {
     updateStats() {
         document.getElementById('totalCompanies').textContent = this.companies.length;
         document.getElementById('filteredCompanies').textContent = this.filteredCompanies.length;
+        
+        // Update total stats
+        document.getElementById('totalQuestions').textContent = this.totalStats.totalQuestions.toLocaleString();
+        document.getElementById('avgQuestions').textContent = this.totalStats.avgQuestions;
+        document.getElementById('easyQuestions').textContent = this.totalStats.easyQuestions.toLocaleString();
+        document.getElementById('mediumQuestions').textContent = this.totalStats.mediumQuestions.toLocaleString();
+        document.getElementById('hardQuestions').textContent = this.totalStats.hardQuestions.toLocaleString();
     }
 
     showError(message) {
