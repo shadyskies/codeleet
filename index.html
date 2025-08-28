@@ -4,12 +4,39 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LeetCode Company-wise Interview Questions</title>
+    
+    <!-- Critical CSS for fast initial render -->
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #000000; color: #00FF41; line-height: 1.6; font-size: 14px;
+        }
+        .container { max-width: 1200px; margin: 0 auto; padding: 16px; }
+        .loading-skeleton { display: contents; }
+        .skeleton-card { 
+            background: #002200; border: 1px solid #004400; border-radius: 12px;
+            padding: 20px; height: 140px; margin-bottom: 16px; position: relative; overflow: hidden;
+        }
+        .skeleton-card::before {
+            content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 255, 65, 0.1), transparent);
+            animation: skeleton-loading 1.5s infinite;
+        }
+        @keyframes skeleton-loading { 0% { left: -100%; } 100% { left: 100%; } }
+    </style>
+    
+    <!-- Preload critical resources -->
+    <link rel="preload" href="styles.css" as="style">
+    <link rel="preload" href="script.js" as="script">
+    <link rel="preload" href="company_list.txt" as="fetch" crossorigin>
+    
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>LeetCode Company Interview Questions</h1>
+            <h1>🚀 LeetCode Company-wise Interview Questions</h1>
             <p>Select a company to view their frequently asked interview questions</p>
         </header>
         
@@ -27,37 +54,18 @@
                 <h3 id="filteredCompanies">0</h3>
                 <p>Filtered</p>
             </div>
-            <div class="stat-card">
-                <h3 id="totalQuestions">0</h3>
-                <p>Questions</p>
-            </div>
-            <div class="stat-card">
-                <h3 id="avgQuestions">0</h3>
-                <p>Avg per Company</p>
-            </div>
-            <div class="stat-card difficulty-easy">
-                <h3 id="easyQuestions">0</h3>
-                <p>Easy</p>
-            </div>
-            <div class="stat-card difficulty-medium">
-                <h3 id="mediumQuestions">0</h3>
-                <p>Medium</p>
-            </div>
-            <div class="stat-card difficulty-hard">
-                <h3 id="hardQuestions">0</h3>
-                <p>Hard</p>
-            </div>
-        </div>
-        
-        <div id="loadingStats" class="loading-stats" style="display: none;">
-            <div class="loading-bar">
-                <div class="loading-progress" id="loadingProgress"></div>
-            </div>
-            <p id="loadingText">Loading company statistics... <span id="loadingCount">0</span>/<span id="totalCount">0</span></p>
         </div>
         
         <div class="companies-grid" id="companiesGrid">
-            <!-- Companies will be loaded here -->
+            <!-- Initial loading skeleton -->
+            <div class="loading-skeleton">
+                <div class="skeleton-card"></div>
+                <div class="skeleton-card"></div>
+                <div class="skeleton-card"></div>
+                <div class="skeleton-card"></div>
+                <div class="skeleton-card"></div>
+                <div class="skeleton-card"></div>
+            </div>
         </div>
         
         <footer>
@@ -65,6 +73,6 @@
         </footer>
     </div>
     
-    <script src="script.js"></script>
+    <script src="script.js" defer></script>
 </body>
 </html>
