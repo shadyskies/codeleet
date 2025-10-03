@@ -308,11 +308,10 @@ class CompanyQuestions {
         const rows = document.querySelectorAll('#questionsBody tr');
         rows.forEach(row => {
             row.addEventListener('click', (e) => {
-                if (e.target.tagName !== 'A') {
-                    const link = row.querySelector('.question-title');
-                    if (link) {
-                        window.open(link.href, '_blank');
-                    }
+                //redirect only on click of "View Problem" and the title
+                if (e.target.classList.contains('question-title') || 
+                    e.target.classList.contains('leetcode-link')) {
+                    return;
                 }
             });
         });
